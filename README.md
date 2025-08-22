@@ -102,22 +102,6 @@ yarn build
 4. `.env` 파일에 설정 정보 입력
 5. 관리자 패널에서 기존 과목 데이터를 데이터베이스로 마이그레이션
 
-## 🔑 테스트 계정
-
-### 관리자 계정
-- **이메일**: admin@sogang.ac.kr
-- **비밀번호**: admin123
-- **권한**: 전체 시스템 관리
-
-### 학생 계정
-- **이메일**: student1@sogang.ac.kr
-- **비밀번호**: password
-- **권한**: 수강신청 및 조회
-
-추가 테스트 계정:
-- student2@sogang.ac.kr / password
-- student3@sogang.ac.kr / password
-
 ## 📋 데이터 구조
 
 ### User (사용자)
