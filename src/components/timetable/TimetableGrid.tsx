@@ -145,47 +145,41 @@ const TimetableGrid: React.FC = () => {
       <div className="timetable-grid">
         {/* Header row */}
         <div className="header-row">
-          <div className="time-header">시간</div>
+          <div className="time-header">구분</div>
           {daysOfWeek.map(day => (
             <div key={day.key} className="day-header">
-              <div className="day-short">{day.label}</div>
               <div className="day-full">{day.name}</div>
             </div>
           ))}
         </div>
 
-        {/* Time slots for weekdays */}
+        {/* Combined time slots */}
         {timeSlots.map((slot, slotIndex) => (
-          <div key={`weekday-${slotIndex}`} className="time-row">
+          <div key={`combined-${slotIndex}`} className="time-row">
             <div className="time-label">
               <div className="time-period">{slot.label}</div>
-              <div className="time-range">{slot.start}-{slot.end}</div>
+              <div className="time-range">
+                {slot.description.split('\n').map((line, index) => (
+                  <div key={index}>{line.trim()}</div>
+                ))}
+              </div>
             </div>
-            {daysOfWeek.slice(0, 5).map(day => 
+            {/* Weekday slots (Monday to Thursday) */}
+            {daysOfWeek.slice(0, 4).map(day => 
               renderTimeSlot(day.key, slot.start + '-' + slot.end, slotIndex)
             )}
-            {/* Saturday column for weekday slots */}
-            <div className="time-slot empty-slot saturday-empty">
-              <span>-</span>
-            </div>
-          </div>
-        ))}
-
-        {/* Saturday specific time slots */}
-        {saturdayTimeSlots.map((slot, slotIndex) => (
-          <div key={`saturday-${slotIndex}`} className="time-row saturday-row">
-            <div className="time-label">
-              <div className="time-period">토{slotIndex + 1}</div>
-              <div className="time-range">{slot.start}-{slot.end}</div>
-            </div>
-            {/* Empty slots for weekdays */}
-            {daysOfWeek.slice(0, 5).map(day => (
-              <div key={`${day.key}-saturday-empty`} className="time-slot empty-slot">
-                <span>-</span>
-              </div>
-            ))}
-            {/* Saturday slot */}
-            {renderTimeSlot('saturday', slot.start + '-' + slot.end, slotIndex)}
+            {/* Saturday slot with corresponding time */}
+            {(() => {
+              const saturdaySlot = saturdayTimeSlots[slotIndex];
+              if (saturdaySlot) {
+                return renderTimeSlot('saturday', saturdaySlot.start + '-' + saturdaySlot.end, slotIndex);
+              }
+              return (
+                <div className="time-slot empty-slot">
+                  <span>-</span>
+                </div>
+              );
+            })()}
           </div>
         ))}
       </div>

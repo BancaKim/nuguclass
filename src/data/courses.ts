@@ -345,8 +345,8 @@ export const courses: Course[] = [
 ];
 
 export const timeSlots = [
-  { start: '18:30', end: '20:00', label: '1교시' },
-  { start: '20:10', end: '21:40', label: '2교시' }
+  { start: '18:30', end: '20:00', label: '1교시', description: '월-목: 18:30~20:00,\n 토: 09:30~11:00' },
+  { start: '20:10', end: '21:40', label: '2교시', description: '월-목: 20:10~21:40,\n 토: 11:10~12:40' }
 ];
 
 export const saturdayTimeSlots = [
@@ -359,6 +359,5 @@ export const daysOfWeek = [
   { key: 'tuesday', label: '화', name: '화요일' },
   { key: 'wednesday', label: '수', name: '수요일' },
   { key: 'thursday', label: '목', name: '목요일' },
-  { key: 'friday', label: '금', name: '금요일' },
   { key: 'saturday', label: '토', name: '토요일' }
 ];

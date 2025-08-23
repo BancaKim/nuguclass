@@ -3,10 +3,11 @@ import { useAuth } from '../../contexts/AuthContext';
 
 interface HeaderProps {
   onAdminClick?: () => void;
+  onMyPageClick?: () => void;
   showAdminButton?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAdminClick, showAdminButton = false }) => {
+const Header: React.FC<HeaderProps> = ({ onAdminClick, onMyPageClick, showAdminButton = false }) => {
   const { user, logout } = useAuth();
   
   // 디버깅을 위한 콘솔 로그
@@ -32,6 +33,12 @@ const Header: React.FC<HeaderProps> = ({ onAdminClick, showAdminButton = false }
           </div>
           
           <div className="header-buttons">
+            <button 
+              onClick={onMyPageClick}
+              className="mypage-button"
+            >
+              마이페이지
+            </button>
             {showAdminButton && user?.isAdmin && (
               <button 
                 onClick={onAdminClick}

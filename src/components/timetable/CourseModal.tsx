@@ -162,7 +162,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
                     <tr>
                       <th>순번</th>
                       <th>이름</th>
-                      <th>수강신청일</th>
+                      <th>기수</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -170,7 +170,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
                       <tr key={enrollment.registration_id}>
                         <td>{index + 1}</td>
                         <td>{enrollment.user_name}</td>
-                        <td>{new Date(enrollment.registered_at).toLocaleDateString('ko-KR')}</td>
+                        <td>{enrollment.user_batch}</td>
                       </tr>
                     ))}
                   </tbody>

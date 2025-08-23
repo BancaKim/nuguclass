@@ -6,6 +6,7 @@ export const defaultUsers: User[] = [
     name: '관리자',
     studentId: 'admin',
     email: 'admin@sogang.ac.kr',
+    batch: '관리자',
     isAdmin: true
   },
   {
@@ -13,6 +14,7 @@ export const defaultUsers: User[] = [
     name: '김학생',
     studentId: 'S25001',
     email: 'student1@sogang.ac.kr',
+    batch: '72기',
     isAdmin: false
   },
   {
@@ -20,6 +22,7 @@ export const defaultUsers: User[] = [
     name: '이학생',
     studentId: 'S25002',
     email: 'student2@sogang.ac.kr',
+    batch: '73기',
     isAdmin: false
   },
   {
@@ -27,6 +30,7 @@ export const defaultUsers: User[] = [
     name: '박학생',
     studentId: 'S25003',
     email: 'student3@sogang.ac.kr',
+    batch: '74기',
     isAdmin: false
   }
 ];

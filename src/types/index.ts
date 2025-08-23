@@ -3,7 +3,10 @@ export interface User {
   name: string;
   studentId: string;
   email: string;
+  phone?: string; // 핸드폰 번호 (선택사항)
+  batch: string; // 기수 (예: 72기)
   isAdmin: boolean;
+  password?: string; // 비밀번호 (업데이트 시에만 사용)
 }
 
 export interface Course {

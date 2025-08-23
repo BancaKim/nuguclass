@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { encrypt, testEncryption } from '../../utils/encryption';
 
 interface SignupFormProps {
   onBack: () => void;
@@ -12,6 +13,7 @@ interface SignupData {
   confirmPassword: string;
   name: string;
   phone: string;
+  batch: string;
 }
 
 const SignupForm: React.FC<SignupFormProps> = ({ onBack, onSignupSuccess }) => {
@@ -20,11 +22,17 @@ const SignupForm: React.FC<SignupFormProps> = ({ onBack, onSignupSuccess }) => {
     password: '',
     confirmPassword: '',
     name: '',
-    phone: ''
+    phone: '',
+    batch: ''
   });
   const [errors, setErrors] = useState<Partial<SignupData>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+
+  // 컴포넌트 마운트 시 암호화 테스트 실행
+  useEffect(() => {
+    testEncryption();
+  }, []);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<SignupData> = {};
@@ -57,6 +65,12 @@ const SignupForm: React.FC<SignupFormProps> = ({ onBack, onSignupSuccess }) => {
       newErrors.phone = '올바른 핸드폰 번호를 입력해주세요.';
     }
 
+    if (!formData.batch.trim()) {
+      newErrors.batch = '기수를 입력해주세요.';
+    } else if (!/^\d+기$/.test(formData.batch)) {
+      newErrors.batch = '기수는 숫자 + 기 형식으로 입력해주세요. (예: 72기)';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -85,6 +99,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ onBack, onSignupSuccess }) => {
         return;
       }
 
+      // 휴대폰 번호 암호화
+      const cleanPhone = formData.phone.replace(/-/g, '');
+      const encryptedPhone = encrypt(cleanPhone);
+      
+      console.log('회원가입 - 원본 번호:', cleanPhone);
+      console.log('회원가입 - 암호화된 번호:', encryptedPhone);
+      console.log('회원가입 - 암호화 성공:', encryptedPhone !== cleanPhone);
+
       // 새 사용자 등록
       const { error } = await supabase
         .from('users')
@@ -92,7 +114,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onBack, onSignupSuccess }) => {
           student_id: formData.studentId,
           password: formData.password, // 실제 운영에서는 암호화 필요
           name: formData.name,
-          phone: formData.phone.replace(/-/g, '')
+          phone: encryptedPhone, // 암호화된 휴대폰 번호
+          batch: formData.batch
         }]);
 
       if (error) {
@@ -172,6 +195,20 @@ const SignupForm: React.FC<SignupFormProps> = ({ onBack, onSignupSuccess }) => {
               disabled={isLoading}
             />
             {errors.phone && <div className="field-error">{errors.phone}</div>}
+          </div>
+
+          <div className="form-group compact">
+            <label htmlFor="batch">기수 *</label>
+            <input
+              id="batch"
+              type="text"
+              value={formData.batch}
+              onChange={(e) => handleInputChange('batch', e.target.value)}
+              placeholder="기수를 입력하세요 (예: 72기)"
+              disabled={isLoading}
+              maxLength={4}
+            />
+            {errors.batch && <div className="field-error">{errors.batch}</div>}
           </div>
 
           <div className="form-group compact">

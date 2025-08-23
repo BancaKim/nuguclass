@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import type { User, Registration, Course } from '../../types';
-import { storageUtils } from '../../utils/storage';
-import { courses } from '../../data/courses';
+import type { User, Course } from '../../types';
 import { CourseService } from '../../services/courseService';
+import { UserService } from '../../services/userService';
+import { RegistrationService } from '../../services/registrationService';
 import { useToast } from '../../hooks/useToast';
 import CourseForm from './CourseForm';
 
@@ -13,7 +13,7 @@ interface AdminPanelProps {
 const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState<'users' | 'courses' | 'registrations'>('users');
   const [users, setUsers] = useState<User[]>([]);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [registrations, setRegistrations] = useState<any[]>([]);
   const [dbCourses, setDbCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCourseForm, setShowCourseForm] = useState(false);
@@ -27,49 +27,56 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const loadedUsers = storageUtils.getUsers();
-      const loadedRegistrations = storageUtils.getRegistrations();
+      // Load data from Supabase
+      const loadedUsers = await UserService.getAllUsers();
+      const loadedRegistrations = await RegistrationService.getAllRegistrations();
       const loadedCourses = await CourseService.getAllCourses();
       
+      console.log('AdminPanel - Loaded users from DB:', loadedUsers.length);
+      console.log('AdminPanel - Loaded registrations from DB:', loadedRegistrations.length);
       console.log('AdminPanel - Loaded courses from DB:', loadedCourses.length);
-      console.log('AdminPanel - Courses data:', loadedCourses);
       
       setUsers(loadedUsers);
       setRegistrations(loadedRegistrations);
       setDbCourses(loadedCourses);
     } catch (error) {
-      console.error('Failed to load data:', error);
+      console.error('AdminPanel - Failed to load data:', error);
       showError('데이터 로딩에 실패했습니다.');
+      // Set empty arrays on error to prevent UI crashes
+      setUsers([]);
+      setRegistrations([]);
+      setDbCourses([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const getUserRegistrations = (userId: string) => {
-    return registrations.filter(reg => reg.userId === userId);
+    return registrations.filter(reg => reg.user_id.toString() === userId);
   };
 
   const getCourseRegistrations = (courseCode: string) => {
-    return registrations.filter(reg => reg.courseCode === courseCode);
+    return registrations.filter(reg => reg.course_code === courseCode);
   };
 
-  const handleDeleteRegistration = (regId: string) => {
+  const handleDeleteRegistration = async () => {
     if (confirm('이 수강 신청을 삭제하시겠습니까?')) {
-      const updatedRegistrations = registrations.filter(reg => reg.id !== regId);
-      storageUtils.saveRegistrations(updatedRegistrations);
-      setRegistrations(updatedRegistrations);
+      try {
+        // Note: We need to implement soft delete in RegistrationService
+        // For now, this will need to be updated when we implement admin delete functionality
+        showError('수강신청 삭제 기능은 현재 개발 중입니다.');
+        // TODO: Implement admin registration deletion
+        // await RegistrationService.deleteRegistrationById(regId);
+        // await loadData();
+        // showSuccess('수강신청이 삭제되었습니다.');
+      } catch (error) {
+        console.error('AdminPanel - Failed to delete registration:', error);
+        showError('수강신청 삭제에 실패했습니다.');
+      }
     }
   };
 
-  const getCourseName = (courseCode: string) => {
-    const course = [...courses, ...dbCourses].find(c => c.code === courseCode);
-    return course ? course.name : courseCode;
-  };
-
-  const getUserName = (userId: string) => {
-    const user = users.find(u => u.id === userId);
-    return user ? user.name : '알 수 없음';
-  };
+  // Helper functions removed as they were unused
 
   const handleAddCourse = async (course: Course) => {
     console.log('AdminPanel - Adding course:', course);
@@ -293,19 +300,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 </thead>
                 <tbody>
                   {registrations.map(registration => (
-                    <tr key={registration.id}>
-                      <td>{getUserName(registration.userId)}</td>
+                    <tr key={registration.registration_id}>
+                      <td>{registration.user_name}</td>
+                      <td>{registration.student_id}</td>
+                      <td>{registration.course_code}</td>
+                      <td>{registration.course_name}</td>
                       <td>
-                        {users.find(u => u.id === registration.userId)?.studentId || '알 수 없음'}
-                      </td>
-                      <td>{registration.courseCode}</td>
-                      <td>{getCourseName(registration.courseCode)}</td>
-                      <td>
-                        {new Date(registration.registeredAt).toLocaleString('ko-KR')}
+                        {new Date(registration.registered_at).toLocaleString('ko-KR')}
                       </td>
                       <td>
                         <button
-                          onClick={() => handleDeleteRegistration(registration.id)}
+                          onClick={() => handleDeleteRegistration()}
                           className="delete-button"
                         >
                           삭제

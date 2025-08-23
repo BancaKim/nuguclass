@@ -67,6 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           name: dbUser.name,
           studentId: dbUser.student_id,
           email: `${dbUser.student_id}@student.sogang.ac.kr`, // Generate email from student ID
+          batch: dbUser.batch,
           isAdmin: dbUser.is_admin || false
         };
         

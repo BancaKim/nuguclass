@@ -6,6 +6,7 @@ export interface EnrollmentDetail {
   user_id: number;
   student_id: string;
   user_name: string;
+  user_batch: string;
   phone: string;
   course_id: string;
   course_code: string;
